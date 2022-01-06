@@ -1,5 +1,6 @@
 import time
 from io import StringIO
+import graphviz as graphviz
 
 import streamlit as st
 from stqdm import stqdm
@@ -30,9 +31,14 @@ else:
         col1.metric(label="Liczba wykorzystanych pojazdów", value=f"{len(results[0])}")
         col2.metric(label="Wartość funkcji celu", value=f"{results[1]:.2f}")
 
+        graph = graphviz.Digraph()
         text_contents = f'''Zbiór tras:\n'''
         for route in results[0]:
             print(route)
+            full_route = [1] + route + [1]
+            for previous, current in zip(full_route, full_route[1:]):
+                graph.edge(str(previous), str(current))
             text_contents += str(route) + "\n"
 
         st.download_button('Pobierz zbiór tras', text_contents)
+        st.graphviz_chart(graph)
